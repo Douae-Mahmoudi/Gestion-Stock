@@ -1,0 +1,191 @@
+/* Styles généraux pour le corps de la page */
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Assure un modèle de boîte cohérent */
+  font-family: 'Inter', sans-serif; /* Assurez-vous que cette police est importée ou disponible */
+}
+
+/* Styles pour le conteneur principal de la page de connexion */
+.login-container {
+  min-height: 100vh; /* Prend toute la hauteur de la fenêtre */
+  display: flex; /* Utilise Flexbox pour centrer le contenu */
+  align-items: center; /* Centre verticalement */
+  justify-content: center; /* Centre horizontalement */
+  background-color: #ededc4; /* Couleur de fond gris clair */
+  padding: 1rem; /* Espacement intérieur pour les petits écrans */
+  padding: 1rem; /* Espacement intérieur pour les petits écrans */
+}
+
+/* Styles pour la carte de connexion */
+.login-card {
+  background-color: #ffffff; /* Fond blanc */
+  padding: 2rem; /* Espacement intérieur */
+  border-radius: 0.5rem; /* Coins arrondis */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Ombre portée */
+  width: 100%; /* Prend toute la largeur disponible */
+  max-width: 28rem; /* Largeur maximale pour les grands écrans */
+  box-sizing: border-box; /* Inclut le padding et le border dans la largeur/hauteur */
+}
+
+/* Styles pour le titre */
+.login-title {
+  font-size: 1.875rem; /* Taille de police grande */
+  font-weight: 700; /* Gras */
+  text-align: center; /* Centré */
+  color: #1f2937; /* Gris foncé */
+  margin-bottom: 1.5rem; /* Marge en bas */
+  display: flex; /* Utilise flexbox pour aligner l'image et le texte */
+  align-items: center; /* Centre verticalement l'image et le texte */
+  justify-content: center; /* Centre horizontalement le contenu du titre */
+  gap: 0.5rem; /* Espacement entre l'image et le texte */
+}
+
+/* Styles pour l'image du logo */
+.logo-img {
+  width: 70px; /* Taille maximale de l'image */
+  height: auto; /* Maintient le ratio d'aspect */
+  vertical-align: middle; /* Aligne l'image avec le texte */
+}
+
+/* Styles pour le sous-titre */
+.login-subtitle {
+  text-align: center; /* Centré */
+  color: #4b5563; /* Gris moyen */
+  margin-bottom: 2rem; /* Marge en bas */
+}
+
+/* Conteneur pour les groupes de formulaire (labels et inputs) */
+.form-group-container {
+  display: flex;
+  flex-direction: column; /* Les éléments s'empilent verticalement */
+  gap: 1rem; /* Espacement entre les éléments */
+}
+
+/* Styles pour les labels des champs de formulaire */
+.form-label {
+  display: block; /* Prend toute la largeur */
+  font-size: 0.875rem; /* Petite taille de police */
+  font-weight: 500; /* Poids de police moyen */
+  color: #374151; /* Gris foncé */
+  margin-bottom: 0.25rem; /* Petite marge en bas */
+}
+
+/* Styles pour les champs de saisie */
+.form-input {
+  display: block; /* Prend toute la largeur */
+  width: 100%;
+  padding: 0.4rem 0.8rem; /* Espacement intérieur réduit (était 0.5rem 1rem) */
+  border: 1px solid #d1d5db; /* Bordure grise */
+  border-radius: 0.375rem; /* Coins légèrement arrondis */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* Petite ombre */
+  outline: none; /* Supprime le contour par défaut au focus */
+  font-size: 0.8rem; /* Taille de police réduite (était 0.875rem) */
+}
+
+/* Styles pour le focus des champs de saisie */
+.form-input:focus {
+  border-color: #3b82f6; /* Bordure bleue au focus */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* Anneau bleu au focus */
+}
+
+/* Styles pour le message d'erreur/succès */
+.message {
+  font-size: 0.875rem; /* Petite taille de police */
+  font-weight: 500; /* Poids de police moyen */
+  text-align: center; /* Centré */
+  /* Couleur par défaut si isError n'est pas utilisé dans le HTML */
+  color: #4b5563; /* Gris neutre par défaut */
+}
+
+/* Styles pour les messages d'erreur (si isError est true via ngClass) */
+.error-message {
+  color: #dc2626; /* Rouge */
+}
+
+/* Styles pour les messages de succès (si isError est false via ngClass) */
+.success-message {
+  color: #16a34a; /* Vert */
+}
+
+/* Styles pour le bouton de connexion */
+.login-button {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: black; /* Bleu */
+  transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Transition douce */
+  cursor: pointer;
+}
+
+/* Styles au survol du bouton */
+.login-button:hover {
+  background-color: #1d4ed8; /* Bleu plus foncé au survol */
+}
+
+/* Styles au focus du bouton */
+.login-button:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #3b82f6; /* Anneau de focus */
+}
+
+/* Styles pour le bouton désactivé */
+.login-button:disabled {
+  opacity: 0.7; /* Transparence */
+  cursor: not-allowed; /* Curseur "interdit" */
+}
+
+/* Styles pour la carte de succès après connexion */
+.success-card {
+  margin-top: 2rem; /* Marge en haut */
+  padding: 1.5rem; /* Espacement intérieur */
+  background-color: #f0fdf4; /* Fond vert très clair */
+  border-radius: 0.5rem; /* Coins arrondis */
+  border: 1px solid #dcfce7; /* Bordure verte claire */
+  text-align: center; /* Centré */
+}
+
+/* Styles pour le titre de la carte de succès */
+.success-title {
+  font-size: 1.5rem; /* Taille de police */
+  font-weight: 600; /* Gras */
+  color: #14532d; /* Vert foncé */
+  margin-bottom: 0.75rem; /* Marge en bas */
+}
+
+/* Media queries pour la responsivité */
+@media (max-width: 640px) {
+  .login-card {
+    padding: 1.5rem; /* Réduit le padding sur les petits écrans */
+  }
+
+  .login-title {
+    font-size: 1.5rem; /* Réduit la taille du titre sur les petits écrans */
+  }
+
+  .login-button {
+    font-size: 1rem; /* Réduit la taille de police du bouton */
+  }
+}
+
+@media (max-width: 400px) {
+  .login-card {
+    padding: 1rem; /* Réduit encore le padding sur les très petits écrans */
+  }
+
+  .login-title {
+    font-size: 1.3rem; /* Réduit encore la taille du titre */
+  }
+
+  .logo-img {
+    max-width: 2rem; /* Réduit la taille du logo */
+  }
+}

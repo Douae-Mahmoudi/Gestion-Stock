@@ -1,0 +1,306 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1 class="dashboard-main-title"><img src="material-management.png" class="logo-img">Tableau de Bord de Gestion de Stock</h1>
+    <p class="dashboard-welcome-message">Bienvenue, ici vous gérez votre stock efficacement.</p>
+  </header>
+
+  <!-- Navigation par boutons pour changer de section -->
+  <nav class="dashboard-nav">
+    <ul>
+      <li><button [class.active]="activeSection === 'stats'" (click)="setActiveSection('stats')"><img src="analysis.png" class="logo"> Statistiques</button></li>
+      <li><button [class.active]="activeSection === 'forms'" (click)="setActiveSection('forms')"><img src="checklist.png" class="logo"> Formulaires Rapides</button></li>
+      <li><button [class.active]="activeSection === 'movements'" (click)="setActiveSection('movements')"><img src="product.png" class="logo"> Mouvements</button></li>
+      <li><button [class.active]="activeSection === 'product-management'" (click)="setActiveSection('product-management')"><img src="carton.png" class="logo"> Gestion Produits</button></li>
+      <li><button [class.active]="activeSection === 'supplier-management'" (click)="setActiveSection('supplier-management')"><img src="partnership.png" class="logo"> Gestion Fournisseurs</button></li>
+    </ul>
+  </nav>
+
+  <main class="dashboard-content">
+
+    <!-- Section  Statistiques & Graphiques -->
+    <section class="section-card" *ngIf="activeSection === 'stats'">
+      <h2 class="section-title"><img src="analysis.png" class="logo1"> Statistiques & Graphiques</h2>
+      <div class="stats-cards-grid">
+        <div class="stat-card">
+          <h3 class="stat-card-title">Total Produits</h3>
+          <p class="stat-card-value">{{ totalProducts }}</p>
+        </div>
+        <div class="stat-card">
+          <h3 class="stat-card-title">Quantité Totale en Stock</h3>
+          <p class="stat-card-value">{{ totalQuantity }}</p>
+        </div>
+        <div class="stat-card">
+          <h3 class="stat-card-title">Produits en Faible Stock</h3>
+          <p class="stat-card-value">{{ lowStockProducts }}</p>
+        </div>
+      </div>
+
+      <div class="graph-container">
+        <h3 class="graph-title">Quantités des Derniers Mouvements</h3>
+        <!-- Canvas pour le graphique Chart.js des mouvements -->
+        <canvas id="movementChart"></canvas>
+      </div>
+
+      <div class="graph-container mt-4"> <!-- Ajout d'une marge supérieure pour séparer les graphiques -->
+        <h3 class="graph-title">Top 5 des Produits les Plus Achetés</h3>
+        <!-- Nouveau Canvas pour le graphique Chart.js des produits les plus achetés -->
+        <canvas id="mostPurchasedChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Section  Formulaires rapides -->
+    <section class="section-card" *ngIf="activeSection === 'forms'">
+      <h2 class="section-title"><img src="checklist.png" class="logo1"> Formulaires rapides</h2>
+      <div class="forms-grid">
+        <!-- Formulaire rapide pour Ajouter un Produit -->
+        <div class="quick-form-card">
+          <h3 class="form-card-title">Ajouter un Produit</h3>
+          <div class="form-group">
+            <label for="newProductName" class="form-label">Nom du produit</label>
+            <input type="text" id="newProductName" [(ngModel)]="newProduct.name" class="form-input" placeholder="Ex: Chaise de bureau">
+          </div>
+          <div class="form-group">
+            <label for="newProductQty" class="form-label">Quantité</label>
+            <input type="number" id="newProductQty" [(ngModel)]="newProduct.quantity" class="form-input" placeholder="Ex: 50">
+          </div>
+          <div class="form-group">
+            <label for="newProductPrice" class="form-label">Prix Unitaire</label>
+            <input type="number" id="newProductPrice" [(ngModel)]="newProduct.price" class="form-input" placeholder="Ex: 25.99">
+          </div>
+          <div class="form-group">
+            <label for="newProductSupplier" class="form-label">Fournisseur</label>
+            <select id="newProductSupplier" [(ngModel)]="newProduct.supplierId" class="form-input">
+              <option [ngValue]="null" disabled>Sélectionner un fournisseur</option>
+              <option *ngFor="let supplier of suppliersForDropdown" [ngValue]="supplier.id_fournisseur">{{ supplier.nom }}</option>
+            </select>
+          </div>
+          <button (click)="addQuickProduct()" class="form-button add-button">Ajouter Produit</button>
+        </div>
+
+        <!-- Formulaire rapide pour Enregistrer un Achat (SANS fournisseur de l'achat) -->
+        <div class="quick-form-card">
+          <h3 class="form-card-title">Enregistrer un Achat</h3>
+          <div class="form-group">
+            <label for="purchaseProduct" class="form-label">Produit</label>
+            <select id="purchaseProduct" [(ngModel)]="selectedPurchaseProductId" class="form-input">
+              <option [ngValue]="null" disabled>Sélectionner un produit</option>
+              <option *ngFor="let product of productsForDropdown" [ngValue]="product.id_produit">{{ product.nom }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="purchaseQty" class="form-label">Quantité Achetée</label>
+            <input type="number" id="purchaseQty" [(ngModel)]="newPurchase.quantity" class="form-input" placeholder="Ex: 10">
+          </div>
+          <!-- Le champ "Fournisseur de l'achat" a été retiré ici -->
+          <button (click)="recordQuickPurchase()" class="form-button purchase-button">Enregistrer Achat</button>
+        </div>
+
+        <!-- Formulaire rapide pour Enregistrer une Vente (avec combobox) -->
+        <div class="quick-form-card">
+          <h3 class="form-card-title">Enregistrer une Vente</h3>
+          <div class="form-group">
+            <label for="saleProduct" class="form-label">Produit</label>
+            <select id="saleProduct" [(ngModel)]="selectedSaleProductId" class="form-input">
+              <option [ngValue]="null" disabled>Sélectionner un produit</option>
+              <option *ngFor="let product of productsForDropdown" [ngValue]="product.id_produit">{{ product.nom }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="saleQty" class="form-label">Quantité Vendue</label>
+            <input type="number" id="saleQty" [(ngModel)]="newSale.quantity" class="form-input" placeholder="Ex: 2">
+          </div>
+          <div class="form-group">
+            <label for="salePrice" class="form-label">Prix de Vente</label>
+            <input type="number" id="salePrice" [(ngModel)]="newSale.salePrice" class="form-input" placeholder="Ex: 35.00">
+          </div>
+          <button (click)="recordQuickSale()" class="form-button sale-button">Enregistrer Vente</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Zone Mouvements de Stock -->
+    <section class="section-card" *ngIf="activeSection === 'movements'">
+      <h2 class="section-title"><img src="product.png" class="logo1"> Zone Mouvements de Stock</h2>
+      <div class="recent-movements-card">
+        <h3 class="card-subtitle">Derniers Mouvements</h3>
+        <table class="movements-table">
+          <thead>
+          <tr>
+            <th>Date</th>
+            <th>Produit</th>
+            <th>Type</th>
+            <th>Quantité</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let movement of recentMovements">
+            <td>{{ movement.date | date:'short' }}</td>
+            <td>{{ movement.nom_produit }} (ID: {{ movement.id_produit }})</td>
+            <td [ngClass]="{'movement-in': movement.type === 'Entrée', 'movement-out': movement.type === 'Sortie', 'movement-adjust': movement.type === 'Ajustement'}">
+              {{ movement.type }}
+            </td>
+            <td>{{ movement.quantite }}</td>
+          </tr>
+          <tr *ngIf="recentMovements.length === 0">
+            <td colspan="4" class="no-data-message">Aucun mouvement récent.</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Nouvelle Section  Gestion des Produits (Tableau avec Modifier/Supprimer) -->
+    <section class="section-card" *ngIf="activeSection === 'product-management'">
+      <h2 class="section-title"><img src="carton.png" class="logo1">Gestion des Produits</h2>
+
+      <!-- Formulaire de modification (visible si un produit est sélectionné pour édition) -->
+      <div *ngIf="selectedProductForEdit" class="edit-product-form-card">
+        <h3 class="form-card-title">Modifier Produit: {{ selectedProductForEdit.nom }} (ID: {{ selectedProductForEdit.id_produit }})</h3>
+        <div class="form-group">
+          <label for="editProductName" class="form-label">Nom du produit</label>
+          <input type="text" id="editProductName" [(ngModel)]="selectedProductForEdit.nom" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="editProductDesc" class="form-label">Description</label>
+          <textarea id="editProductDesc" [(ngModel)]="selectedProductForEdit.description" class="form-input"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="editProductQty" class="form-label">Quantité</label>
+          <input type="number" id="editProductQty" [(ngModel)]="selectedProductForEdit.quantite" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="editProductPrice" class="form-label">Prix Unitaire</label>
+          <input type="number" id="editProductPrice" [(ngModel)]="selectedProductForEdit.prix_unitaire" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="editProductSupplier" class="form-label">Fournisseur</label>
+          <select id="editProductSupplier" [(ngModel)]="selectedProductForEdit.id_fournisseur" class="form-input">
+            <option [ngValue]="null" disabled>Sélectionner un fournisseur</option>
+            <option *ngFor="let supplier of suppliersForDropdown" [ngValue]="supplier.id_fournisseur">{{ supplier.nom }}</option>
+          </select>
+        </div>
+        <div class="form-buttons-row">
+          <button (click)="saveProductEdit()" class="form-button add-button">Sauvegarder Modifications</button>
+          <button (click)="cancelEdit()" class="form-button cancel-button">Annuler</button>
+        </div>
+      </div>
+
+      <!-- Tableau des produits -->
+      <div class="product-table-container">
+        <table class="movements-table">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Quantité</th>
+            <th>Prix Unitaire</th>
+            <th>Fournisseur</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let product of allProducts">
+            <td>{{ product.id_produit }}</td>
+            <td>{{ product.nom }}</td>
+            <td>{{ product.quantite }}</td>
+            <td>{{ product.prix_unitaire | number:'1.2-2' }}</td>
+            <td>{{ product.nom_fournisseur || 'N/A' }}</td>
+            <td class="action-buttons">
+              <button (click)="editProduct(product)" class="action-button edit-button">Modifier</button>
+              <button (click)="deleteProduct(product.id_produit)" class="action-button delete-button">Supprimer</button>
+            </td>
+          </tr>
+          <tr *ngIf="allProducts.length === 0">
+            <td colspan="6" class="no-data-message">Aucun produit enregistré.</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Nouvelle Section  Gestion des Fournisseurs -->
+    <section class="section-card" *ngIf="activeSection === 'supplier-management'">
+      <h2 class="section-title"><img src="partnership.png" class="logo1"> Gestion des Fournisseurs</h2>
+
+      <!-- Formulaire d'ajout de fournisseur -->
+      <div class="quick-form-card">
+        <h3 class="form-card-title">Ajouter un Nouveau Fournisseur</h3>
+        <div class="form-group">
+          <label for="newSupplierName" class="form-label">Nom du fournisseur</label>
+          <input type="text" id="newSupplierName" [(ngModel)]="newSupplier.nom" class="form-input" placeholder="Ex: Fournisseur A">
+        </div>
+        <div class="form-group">
+          <label for="newSupplierAddress" class="form-label">Adresse</label>
+          <input type="text" id="newSupplierAddress" [(ngModel)]="newSupplier.adresse" class="form-input" placeholder="Ex: 123 Rue de la Fourniture">
+        </div>
+        <div class="form-group">
+          <label for="newSupplierPhone" class="form-label">Téléphone</label>
+          <input type="text" id="newSupplierPhone" [(ngModel)]="newSupplier.telephone" class="form-input" placeholder="Ex: +33 1 23 45 67 89">
+        </div>
+        <div class="form-group">
+          <label for="newSupplierEmail" class="form-label">Email</label>
+          <input type="email" id="newSupplierEmail" [(ngModel)]="newSupplier.email" class="form-input" placeholder="Ex: contact@fournisseur.com">
+        </div>
+        <button (click)="addSupplier()" class="form-button add-button">Ajouter Fournisseur</button>
+      </div>
+
+      <!-- Formulaire de modification de fournisseur (visible si un fournisseur est sélectionné) -->
+      <div *ngIf="selectedSupplierForEdit" class="edit-product-form-card mt-4">
+        <h3 class="form-card-title">Modifier Fournisseur: {{ selectedSupplierForEdit.nom }} (ID: {{ selectedSupplierForEdit.id_fournisseur }})</h3>
+        <div class="form-group">
+          <label for="editSupplierName" class="form-label">Nom du fournisseur</label>
+          <input type="text" id="editSupplierName" [(ngModel)]="selectedSupplierForEdit.nom" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="editSupplierAddress" class="form-label">Adresse</label>
+          <input type="text" id="editSupplierAddress" [(ngModel)]="selectedSupplierForEdit.adresse" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="editSupplierPhone" class="form-label">Téléphone</label>
+          <input type="text" id="editSupplierPhone" [(ngModel)]="selectedSupplierForEdit.telephone" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="editSupplierEmail" class="form-label">Email</label>
+          <input type="email" id="editSupplierEmail" [(ngModel)]="selectedSupplierForEdit.email" class="form-input">
+        </div>
+        <div class="form-buttons-row">
+          <button (click)="saveSupplierEdit()" class="form-button add-button">Sauvegarder Modifications</button>
+          <button (click)="cancelSupplierEdit()" class="form-button cancel-button">Annuler</button>
+        </div>
+      </div>
+
+      <!-- Tableau des fournisseurs -->
+      <div class="product-table-container mt-4">
+        <table class="movements-table">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Adresse</th>
+            <th>Téléphone</th>
+            <th>Email</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let supplier of allSuppliers">
+            <td>{{ supplier.id_fournisseur }}</td>
+            <td>{{ supplier.nom }}</td>
+            <td>{{ supplier.adresse }}</td>
+            <td>{{ supplier.telephone }}</td>
+            <td>{{ supplier.email }}</td>
+            <td class="action-buttons">
+              <button (click)="editSupplier(supplier)" class="action-button edit-button">Modifier</button>
+              <button (click)="deleteSupplier(supplier.id_fournisseur)" class="action-button delete-button">Supprimer</button>
+            </td>
+          </tr>
+          <tr *ngIf="allSuppliers.length === 0">
+            <td colspan="6" class="no-data-message">Aucun fournisseur enregistré.</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
