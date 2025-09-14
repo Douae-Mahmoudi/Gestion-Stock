@@ -17,9 +17,7 @@ $input = json_decode(file_get_contents('php://input'), true);
 $username = $input['username'] ?? '';
 $password = $input['password'] ?? '';
 
-// --- Début de la logique d'authentification ---
-// Note: Cette partie ne nécessite PAS de base de données pour l'instant.
-// Elle utilise des identifiants en dur pour le test.
+
 
 if ($username === 'admin' && $password === 'stock2025') {
     // Si les identifiants sont corrects
