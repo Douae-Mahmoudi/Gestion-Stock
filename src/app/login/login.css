@@ -3,7 +3,7 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box; /* Assure un modèle de boîte cohérent */
-  font-family: 'Inter', sans-serif; /* Assurez-vous que cette police est importée ou disponible */
+  font-family: 'Inter', sans-serif;
 }
 
 /* Styles pour le conteneur principal de la page de connexion */
